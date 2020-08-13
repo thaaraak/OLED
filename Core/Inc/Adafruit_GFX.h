@@ -2,8 +2,9 @@
 #define _ADAFRUIT_GFX_H
 
 #include <stdint.h>
+#include <stdio.h>
 #include <math.h>
-#include <cstring>
+//#include <cstring>
 #include "gfxfont.h"
 
 /// A generic graphics superclass that can handle all sorts of drawing. At a
@@ -113,6 +114,7 @@ public:
   void setFont(const GFXfont *f = NULL);
 
   size_t write(uint8_t c);
+  void printf(const char* fmt, ...);
 
   /**********************************************************************/
   /*!

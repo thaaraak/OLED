@@ -42,8 +42,6 @@ OLED_GFX oled = OLED_GFX();
 
  void runTest()
  {
-	 char buf[20];
-
 	 oled.setFont( &FreeMono12pt7b );
 	 oled.setTextColor( RED );
 	 oled.setCursor( 0, 50 );

@@ -9,10 +9,10 @@
   * <h2><center>&copy; Copyright (c) 2020 STMicroelectronics.
   * All rights reserved.</center></h2>
   *
-  * This software component is licensed by ST under BSD 3-Clause license,
-  * the "License"; You may not use this file except in compliance with the
-  * License. You may obtain a copy of the License at:
-  *                        opensource.org/licenses/BSD-3-Clause
+  * This software component is licensed by ST under Ultimate Liberty license
+  * SLA0044, the "License"; You may not use this file except in compliance with
+  * the License. You may obtain a copy of the License at:
+  *                             www.st.com/SLA0044
   *
   ******************************************************************************
   */
@@ -22,6 +22,11 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "stm32f4xx_hal.h"
+#include "OLED_Driver.h"
+#include "OLED_GFX.h"
+#include "FreeMono12pt7b.h"
+#include "Encoder.h"
 
 /* USER CODE END Includes */
 
@@ -43,6 +48,10 @@
 SPI_HandleTypeDef hspi1;
 
 /* USER CODE BEGIN PV */
+volatile int encoderValue = 0;
+volatile int clkFlag = 0;
+volatile int dtFlag = 0;
+OLED_GFX oled = OLED_GFX();
 
 /* USER CODE END PV */
 
@@ -51,11 +60,14 @@ void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_SPI1_Init(void);
 /* USER CODE BEGIN PFP */
-
+void init(void);
+void runTest(void);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+
+Encoder encoder( GPIOB, GPIO_PIN_13, GPIOB, GPIO_PIN_14 );
 
 /* USER CODE END 0 */
 
@@ -94,9 +106,19 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+  oled.Device_Init();
+
   while (1)
   {
-    /* USER CODE END WHILE */
+	  if ( encoder.hasChanged() )
+	  {
+		  oled.setCursor( 0, 50 );
+		  oled.setTextColor( RED, BLACK );
+		  oled.printf( "Encoder: %3d", encoder.getEncoderValue() );
+		  encoder.reset();
+	  }
+
+	  /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
   }
@@ -246,6 +268,17 @@ static void MX_GPIO_Init(void)
 
 /* USER CODE BEGIN 4 */
 
+
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+  UNUSED(GPIO_Pin);
+
+  if ( GPIO_Pin == GPIO_PIN_13 )
+	  encoder.clkInterrupt();
+  else if ( GPIO_Pin == GPIO_PIN_14 )
+	  encoder.dtInterrupt();
+
+}
 /* USER CODE END 4 */
 
 /**

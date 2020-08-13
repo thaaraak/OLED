@@ -33,6 +33,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
 #include "Adafruit_GFX.h"
 #include "glcdfont.c"
+#include <stdarg.h>
 
 // Many (but maybe not all) non-AVR board installs define macros
 // for compatibility with existing PROGMEM-reading AVR code.
@@ -1453,4 +1454,25 @@ void Adafruit_GFX::invertDisplay(bool i) {
 
 /***************************************************************************/
 
+void Adafruit_GFX::printf(const char* fmt, ...)
+{
+    char buff[256];
+    va_list args;
+    va_start(args, fmt);
+    vsnprintf(buff, sizeof(buff), fmt, args);
+
+    int16_t x = getCursorX();
+    int16_t y = getCursorY();
+    int16_t x1, y1;
+    uint16_t w, h;
+
+    getTextBounds(buff, x, y, &x1, &y1, &w, &h );
+    fillRect( x1, y1, w, h, textbgcolor );
+
+    char* c = buff;
+    while ( *c )
+    	write( *c++ );
+
+    va_end(args);
+}
 
