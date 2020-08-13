@@ -27,8 +27,8 @@ class Encoder
     int	dtFlag = 0;
     int clkFlag = 0;
 
-    int _lastEncoderValue = 0;
-    int _encoderValue;
+    volatile int _lastEncoderValue = 0;
+    volatile int _encoderValue;
     
     GPIO_TypeDef* _clkBase;
     uint16_t _clkPin;

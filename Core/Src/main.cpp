@@ -48,10 +48,12 @@
 SPI_HandleTypeDef hspi1;
 
 /* USER CODE BEGIN PV */
-volatile int encoderValue = 0;
-volatile int clkFlag = 0;
-volatile int dtFlag = 0;
+
 OLED_GFX oled = OLED_GFX();
+Encoder encoder( GPIOB, GPIO_PIN_13, GPIOB, GPIO_PIN_14 );
+
+int frequency = 7200000;
+int radix = 1000;
 
 /* USER CODE END PV */
 
@@ -67,7 +69,6 @@ void runTest(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
-Encoder encoder( GPIOB, GPIO_PIN_13, GPIOB, GPIO_PIN_14 );
 
 /* USER CODE END 0 */
 
@@ -107,6 +108,8 @@ int main(void)
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   oled.Device_Init();
+  oled.setFont( &FreeMono12pt7b );
+  oled.setTextColor( RED );
 
   while (1)
   {
@@ -114,7 +117,17 @@ int main(void)
 	  {
 		  oled.setCursor( 0, 50 );
 		  oled.setTextColor( RED, BLACK );
-		  oled.printf( "Encoder: %3d", encoder.getEncoderValue() );
+
+		  if ( encoder.isUp() )
+			  frequency += radix;
+		  else
+			  frequency -= radix;
+
+		  int millions = frequency / 1000000;
+		  int thousands = ( frequency - millions * 1000000 ) / 1000;
+		  int units = frequency % 1000;
+
+		  oled.printf( "%02d.%03d.%02d ", millions, thousands, units/10 );
 		  encoder.reset();
 	  }
 
@@ -191,7 +204,7 @@ static void MX_SPI1_Init(void)
   hspi1.Init.CLKPolarity = SPI_POLARITY_LOW;
   hspi1.Init.CLKPhase = SPI_PHASE_1EDGE;
   hspi1.Init.NSS = SPI_NSS_SOFT;
-  hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_32;
+  hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_4;
   hspi1.Init.FirstBit = SPI_FIRSTBIT_MSB;
   hspi1.Init.TIMode = SPI_TIMODE_DISABLE;
   hspi1.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
