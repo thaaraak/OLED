@@ -25,7 +25,7 @@
 #include "stm32f4xx_hal.h"
 #include "OLED_Driver.h"
 #include "OLED_GFX.h"
-#include "FreeMono12pt7b.h"
+#include "FrequencyDisplay.h"
 #include "Encoder.h"
 
 /* USER CODE END Includes */
@@ -51,9 +51,6 @@ SPI_HandleTypeDef hspi1;
 
 OLED_GFX oled = OLED_GFX();
 Encoder encoder( GPIOB, GPIO_PIN_13, GPIOB, GPIO_PIN_14 );
-
-int frequency = 7200000;
-int radix = 1000;
 
 /* USER CODE END PV */
 
@@ -103,31 +100,18 @@ int main(void)
   MX_SPI1_Init();
   /* USER CODE BEGIN 2 */
 
+  FrequencyDisplay display = FrequencyDisplay( &oled, &encoder, 7200000 );
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  oled.Device_Init();
-  oled.setFont( &FreeMono12pt7b );
-  oled.setTextColor( RED );
 
   while (1)
   {
 	  if ( encoder.hasChanged() )
 	  {
-		  oled.setCursor( 0, 50 );
-		  oled.setTextColor( RED, BLACK );
-
-		  if ( encoder.isUp() )
-			  frequency += radix;
-		  else
-			  frequency -= radix;
-
-		  int millions = frequency / 1000000;
-		  int thousands = ( frequency - millions * 1000000 ) / 1000;
-		  int units = frequency % 1000;
-
-		  oled.printf( "%02d.%03d.%02d ", millions, thousands, units/10 );
+		  display.change();
 		  encoder.reset();
 	  }
 
