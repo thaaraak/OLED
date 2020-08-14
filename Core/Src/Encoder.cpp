@@ -9,6 +9,10 @@ Encoder::Encoder( GPIO_TypeDef* clkBase, uint16_t clkPin, GPIO_TypeDef* dtBase, 
 	_dtPin = dtPin;
 }
   
+// Both these functions are called from the interrupt handler elsewhere.
+// I wasn't able to solve the debounce problems in code. Tried an ignore delay between 5-50 msec
+// Eventually solved by putting a 0.1uF cap between the pin and ground of Clk and Dt pins
+// Note that this will work when checking on a rising edge
 
 void Encoder::clkInterrupt()
 {

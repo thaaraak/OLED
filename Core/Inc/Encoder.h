@@ -4,6 +4,7 @@
 #include "stm32f4xx_hal.h"
 #include <stdbool.h>
 
+
 class Encoder
 {
   
@@ -24,8 +25,8 @@ class Encoder
     
   private:
     
-    int	dtFlag = 0;
-    int clkFlag = 0;
+    volatile int dtFlag = 0;
+    volatile int clkFlag = 0;
 
     volatile int _lastEncoderValue = 0;
     volatile int _encoderValue;
@@ -34,6 +35,7 @@ class Encoder
     uint16_t _clkPin;
     GPIO_TypeDef* _dtBase;
     uint16_t _dtPin;
+
 
 };
 
